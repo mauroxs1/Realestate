@@ -23,7 +23,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { text, actions } = await getLorenzosReply(`sim_${sessionId}`, message);
+    const { text, actions, suggestions } = await getLorenzosReply(`sim_${sessionId}`, message);
 
     // Procesar acciones de propiedades para enviarlas al simulador
     const properties: PropertyCard[] = [];
@@ -56,7 +56,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    return res.status(200).json({ text, properties });
+    return res.status(200).json({ text, properties, suggestions });
   } catch (error: any) {
     console.error("Error en /api/chat:", error);
     return res.status(500).json({ error: "Error procesando el mensaje", detail: error.message });

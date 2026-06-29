@@ -11,6 +11,7 @@ const ACTIONS_DELIMITER = "---ACTIONS---";
 export interface ParsedResponse {
   text: string;
   actions: Action[];
+  suggestions: string[];
 }
 
 export interface Action {
@@ -71,23 +72,37 @@ export async function getLorenzosReply(
   return parseResponse(fullText);
 }
 
+const SUGGESTIONS_DELIMITER = "---SUGGESTIONS---";
+
 function parseResponse(raw: string): ParsedResponse {
-  const delimIdx = raw.indexOf(ACTIONS_DELIMITER);
-
-  if (delimIdx === -1) {
-    return { text: raw.trim(), actions: [] };
-  }
-
-  const text = raw.slice(0, delimIdx).trim();
-  const jsonPart = raw.slice(delimIdx + ACTIONS_DELIMITER.length).trim();
-
+  let working = raw;
   let actions: Action[] = [];
-  try {
-    const parsed = JSON.parse(jsonPart);
-    actions = parsed.actions ?? [];
-  } catch {
-    console.error("Error parsing actions JSON:", jsonPart);
+  let suggestions: string[] = [];
+
+  // Extraer ---ACTIONS---
+  const actIdx = working.indexOf(ACTIONS_DELIMITER);
+  if (actIdx !== -1) {
+    const jsonPart = working.slice(actIdx + ACTIONS_DELIMITER.length).trim();
+    working = working.slice(0, actIdx).trim();
+    try {
+      const parsed = JSON.parse(jsonPart);
+      actions = parsed.actions ?? [];
+    } catch {
+      console.error("Error parsing actions JSON:", jsonPart);
+    }
   }
 
-  return { text, actions };
+  // Extraer ---SUGGESTIONS---
+  const sugIdx = working.indexOf(SUGGESTIONS_DELIMITER);
+  if (sugIdx !== -1) {
+    const sugPart = working.slice(sugIdx + SUGGESTIONS_DELIMITER.length).trim();
+    working = working.slice(0, sugIdx).trim();
+    try {
+      suggestions = JSON.parse(sugPart);
+    } catch {
+      console.error("Error parsing suggestions JSON:", sugPart);
+    }
+  }
+
+  return { text: working.trim(), actions, suggestions };
 }
