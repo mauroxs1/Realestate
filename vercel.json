@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/webhook.ts",
+      "use": "@vercel/node",
+      "config": { "maxDuration": 60 }
+    }
+  ],
+  "routes": [
+    { "src": "/api/webhook", "dest": "/api/webhook.ts" },
+    { "src": "/api/refresh", "dest": "/api/refresh.ts" }
+  ],
+  "crons": [
+    {
+      "path": "/api/refresh",
+      "schedule": "0 9 * * 1"
+    }
+  ]
+}
