@@ -5,10 +5,21 @@
       "src": "api/webhook.ts",
       "use": "@vercel/node",
       "config": { "maxDuration": 60 }
+    },
+    {
+      "src": "api/chat.ts",
+      "use": "@vercel/node",
+      "config": { "maxDuration": 60 }
+    },
+    {
+      "src": "api/refresh.ts",
+      "use": "@vercel/node",
+      "config": { "maxDuration": 30 }
     }
   ],
   "routes": [
     { "src": "/api/webhook", "dest": "/api/webhook.ts" },
+    { "src": "/api/chat",    "dest": "/api/chat.ts" },
     { "src": "/api/refresh", "dest": "/api/refresh.ts" }
   ],
   "crons": [
